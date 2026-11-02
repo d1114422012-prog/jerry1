@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>張俊宇BMI計算器</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 圖示庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            user-select: none;
+        }
+        @keyframes floatAnim {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .float-avatar {
+            animation: floatAnim 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-sky-50 to-emerald-50 min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- 頂部頁首區域 -->
+    <header class="w-full px-6 py-5 flex flex-col md:flex-row justify-between items-start md:items-center bg-white/80 backdrop-blur-md shadow-sm border-b border-sky-100 gap-4">
+        <!-- 左上角大粗體標題 -->
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-sky-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-sky-500/30">
+                <i class="fa-solid fa-weight-scale text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl md:text-3xl font-black text-sky-900 tracking-wide">
+                    張俊宇BMI計算器
+                </h1>
+                <p class="text-xs font-bold text-sky-600">健康體態檢測與互動養生遊戲</p>
+            </div>
+        </div>
+
+        <!-- 右上角小工具提示 -->
+        <div class="bg-sky-50 px-4 py-2 rounded-2xl border border-sky-200 flex items-center gap-2">
+            <i class="fa-solid fa-heart-pulse text-emerald-500 animate-pulse"></i>
+            <span class="text-xs font-bold text-sky-800">隨時掌握您的身體質量指數</span>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="w-11/12 max-w-4xl mx-auto my-8 grid grid-cols-1 md:grid-cols-12 gap-6">
+        
+        <!-- 左側：輸入與計算區 (佔 6 欄) -->
+        <section class="md:col-span-6 bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-sky-100 flex flex-col justify-between">
+            <div>
+                <h2 class="text-lg font-black text-slate-700 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-sky-500"></i> 輸入身體數值
+                </h2>
+
+                <!-- 身高輸入 -->
+                <div class="mb-4">
+                    <label class="block text-xs font-extrabold text-slate-500 mb-1 uppercase tracking-wider">身高 (cm)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+                            <i class="fa-solid fa-ruler-vertical"></i>
+                        </span>
+                        <input type="number" id="height-input" placeholder="例如: 170" value="170"
+                            class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-400 transition">
+                    </div>
+                </div>
+
+                <!-- 體重輸入 -->
+                <div class="mb-6">
+                    <label class="block text-xs font-extrabold text-slate-500 mb-1 uppercase tracking-wider">體重 (kg)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+                            <i class="fa-solid fa-weight-hanging"></i>
+                        </span>
+                        <input type="number" id="weight-input" placeholder="例如: 65" value="65"
+                            class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-400 transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 計算按鈕 -->
+            <button onclick="calculateBMI()" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-emerald-500 text-white font-black rounded-2xl shadow-lg shadow-sky-500/30 hover:opacity-95 active:scale-95 transition flex items-center justify-center gap-2 text-lg">
+                <i class="fa-solid fa-bolt"></i> 開始檢測 BMI
+            </button>
+        </section>
+
+        <!-- 右側：結果與健康狀態區 (佔 6 欄) -->
+        <section class="md:col-span-6 bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-sky-100 flex flex-col justify-between">
+            <div>
+                <h2 class="text-lg font-black text-slate-700 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-emerald-500"></i> 體態分析與戰力
+                </h2>
+
+                <!-- 數據展示卡片 -->
+                <div class="bg-gradient-to-br from-sky-50 to-emerald-50 rounded-2xl p-5 border border-sky-100 mb-4 text-center">
+                    <span class="text-xs font-bold text-slate-500">您的 BMI 數值</span>
+                    <div id="bmi-value" class="text-4xl md:text-5xl font-black text-sky-900 my-1">22.5</div>
+                    <div id="bmi-status" class="inline-block px-4 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-700 mt-1">
+                        正常範圍 (Normal)
+                    </div>
+                </div>
+
+                <!-- 戰力 / 等級列 -->
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs font-extrabold text-slate-600">
+                        <span>健康靈獸等級: <span id="level-text" class="text-emerald-600">Lv.1 健康初心者</span></span>
+                        <span>EXP: <span id="exp-text">0</span>/100</span>
+                    </div>
+                    <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                        <div id="exp-bar" class="h-full bg-gradient-to-r from-sky-400 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 建議提示 -->
+            <div id="advice-box" class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 font-bold mt-4">
+                <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> 保持均衡飲食與規律運動，讓身體維持最佳狀態！
+            </div>
+        </section>
+
+        <!-- 底部互動養成小遊戲區 (跨全欄) -->
+        <section class="md:col-span-12 bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-sky-100">
+            <h3 class="text-base font-black text-slate-700 mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-gamepad text-indigo-500"></i> 健康養成小任務 (點擊累積經驗值)
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button onclick="addExp(25, '規律運動')" class="p-4 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-2xl transition flex items-center justify-center gap-3 group active:scale-95">
+                    <div class="w-10 h-10 bg-sky-500 text-white rounded-xl flex items-center justify-center shadow">
+                        <i class="fa-solid fa-person-running"></i>
+                    </div>
+                    <div class="text-left">
+                        <div class="text-xs font-extrabold text-sky-900">規律有氧運動</div>
+                        <div class="text-[10px] text-sky-600 font-bold">+25 經驗值</div>
+                    </div>
+                </button>
+
+                <button onclick="addExp(20, '均衡飲食')" class="p-4 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-2xl transition flex items-center justify-center gap-3 group active:scale-95">
+                    <div class="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow">
+                        <i class="fa-solid fa-carrot"></i>
+                    </div>
+                    <div class="text-left">
+                        <div class="text-xs font-extrabold text-emerald-900">均衡健康飲食</div>
+                        <div class="text-[10px] text-emerald-600 font-bold">+20 經驗值</div>
+                    </div>
+                </button>
+
+                <button onclick="addExp(15, '充足睡眠')" class="p-4 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-2xl transition flex items-center justify-center gap-3 group active:scale-95">
+                    <div class="w-10 h-10 bg-indigo-500 text-white rounded-xl flex items-center justify-center shadow">
+                        <i class="fa-solid fa-moon"></i>
+                    </div>
+                    <div class="text-left">
+                        <div class="text-xs font-extrabold text-indigo-900">充足 8 小時睡眠</div>
+                        <div class="text-[10px] text-indigo-600 font-bold">+15 經驗值</div>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="w-full text-center py-4 text-xs font-bold text-slate-400">
+        張俊宇BMI計算器 &copy; 2026 健康生活養成計畫
+    </footer>
+
+    <!-- JavaScript 互動邏輯 -->
+    <script>
+        let currentExp = 0;
+        let currentLevel = 1;
+
+        function calculateBMI() {
+            const heightVal = parseFloat(document.getElementById('height-input').value);
+            const weightVal = parseFloat(document.getElementById('weight-input').value);
+
+            if (!heightVal || !weightVal || heightVal <= 0 || weightVal <= 0) {
+                alert('請輸入有效的身高與體重數值！');
+                return;
+            }
+
+            const heightM = heightVal / 100;
+            const bmi = (weightVal / (heightM * heightM)).toFixed(1);
+
+            document.getElementById('bmi-value').innerText = bmi;
+
+            const statusEl = document.getElementById('bmi-status');
+            const adviceEl = document.getElementById('advice-box');
+
+            if (bmi < 18.5) {
+                statusEl.className = 'inline-block px-4 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-700 mt-1';
+                statusEl.innerText = '體重過輕 (Underweight)';
+                adviceEl.innerHTML = `<i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> 建議增加優質蛋白質與均衡營養攝取，打造健康好體質！`;
+            } else if (bmi >= 18.5 && bmi < 24) {
+                statusEl.className = 'inline-block px-4 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-700 mt-1';
+                statusEl.innerText = '體重正常 (Normal)';
+                adviceEl.innerHTML = `<i class="fa-solid fa-lightbulb text-emerald-500 mr-1"></i> 太棒了！您的體態維持在理想標準範圍，請繼續保持！`;
+            } else if (bmi >= 24 && bmi < 27) {
+                statusEl.className = 'inline-block px-4 py-1 rounded-full text-xs font-black bg-orange-100 text-orange-700 mt-1';
+                statusEl.innerText = '體重過重 (Overweight)';
+                adviceEl.innerHTML = `<i class="fa-solid fa-lightbulb text-orange-500 mr-1"></i> 建議適度減少含糖飲料與高熱量零食，搭配有氧運動更健康！`;
+            } else {
+                statusEl.className = 'inline-block px-4 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-700 mt-1';
+                statusEl.innerText = '肥胖範圍 (Obese)';
+                adviceEl.innerHTML = `<i class="fa-solid fa-lightbulb text-rose-500 mr-1"></i> 建議諮詢專業營養師與醫師，擬定溫和的減重與運動計畫。`;
+            }
+        }
+
+        function addExp(amount, taskName) {
+            currentExp += amount;
+            if (currentExp >= 100) {
+                currentLevel += 1;
+                currentExp = currentExp - 100;
+                alert(`恭喜！您的健康靈獸升級到了 Lv.${currentLevel}！`);
+            }
+
+            document.getElementById('exp-text').innerText = currentExp;
+            document.getElementById('level-text').innerText = `Lv.${currentLevel} 健康養成者`;
+            document.getElementById('exp-bar').style.width = `${currentExp}%`;
+        }
+
+        // 頁面載入時自動計算一次預設值
+        window.onload = function() {
+            calculateBMI();
+        };
+    </script>
+</body>
+</html>
